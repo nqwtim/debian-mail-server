@@ -1,0 +1,4 @@
+*.cer
+*.key
+*.log
+.DS_Store
