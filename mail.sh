@@ -2,7 +2,7 @@
 
 # ====================================================
 # Debian Mail Server Auto-Deploy & Management Console
-# Mail Control Panel Script
+# Mail Control Panel Script (Clean ASCII UI)
 # ====================================================
 
 RED='\033[0;31m'
@@ -10,6 +10,7 @@ GREEN='\033[0;32m'
 YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
+BOLD='\033[1m'
 NC='\033[0m'
 
 if [ "$EUID" -ne 0 ]; then
@@ -50,35 +51,35 @@ manage_users() {
 # 2. SMTP Relay 配置功能
 setup_smtp_relay() {
     clear
-    echo -e "${CYAN}====================================================${NC}"
-    echo -e "${CYAN}    ⚙️  SMTP Relay 中继设置 (适配甲骨文云等 25 端口封禁)   ${NC}"
-    echo -e "${CYAN}====================================================${NC}"
+    echo -e "${CYAN}+----------------------------------------------------+${NC}"
+    echo -e "${CYAN}|         SMTP Relay 中继设置 (规避 25 端口限制)     |${NC}"
+    echo -e "${CYAN}+----------------------------------------------------+${NC}"
     
     CURRENT_RELAY=$(postconf -h relayhost 2>/dev/null)
     if [ -n "$CURRENT_RELAY" ]; then
-        echo -e "当前发信模式: ${GREEN}已启用 SMTP 中继 (${CURRENT_RELAY})${NC}\n"
+        echo -e " 当前发信模式: ${GREEN}已启用 SMTP 中继 (${CURRENT_RELAY})${NC}\n"
     else
-        echo -e "当前发信模式: ${YELLOW}未启用 (25 端口直连模式)${NC}\n"
+        echo -e " 当前发信模式: ${YELLOW}未启用 (25 端口直连模式)${NC}\n"
     fi
 
-    echo -e "1) 配置 / 修改 SMTP 中继 (支持 OCI / Brevo / Resend 等)"
-    echo -e "2) 测试当前 SMTP 中继节点连通性"
-    echo -e "3) 禁用 SMTP 中继 (恢复 25 端口直连)"
-    echo -e "0) 返回主菜单"
-    echo "----------------------------------------------------"
-    read -p "请选择操作 [0-3]: " relay_choice
+    echo -e "  [1] 配置 / 修改 SMTP 中继 (支持 OCI / Brevo / Resend 等)"
+    echo -e "  [2] 测试当前 SMTP 中继节点连通性"
+    echo -e "  [3] 禁用 SMTP 中继 (恢复 25 端口直连)"
+    echo -e "  [0] 返回主菜单"
+    echo -e "${CYAN}+----------------------------------------------------+${NC}"
+    read -p " 请选择操作 [0-3]: " relay_choice
 
     case "$relay_choice" in
         1)
             echo -e "\n${YELLOW}[请输入中继服务商提供的 SMTP 信息]${NC}"
-            read -p "1. SMTP 服务器地址 (例如: smtp.email.us-sanjose-1.oraclecloud.com): " RELAY_HOST
-            read -p "2. SMTP 端口 [默认: 587]: " RELAY_PORT
+            read -p " 1. SMTP 服务器地址 (如: smtp.email.us-sanjose-1.oraclecloud.com): " RELAY_HOST
+            read -p " 2. SMTP 端口 [默认: 587]: " RELAY_PORT
             RELAY_PORT=${RELAY_PORT:-587}
-            read -p "3. SMTP 账号/Username: " RELAY_USER
-            read -p "4. SMTP 密码/Password: " RELAY_PASS
+            read -p " 3. SMTP 账号/Username: " RELAY_USER
+            read -p " 4. SMTP 密码/Password: " RELAY_PASS
 
             if [ -z "$RELAY_HOST" ] || [ -z "$RELAY_USER" ] || [ -z "$RELAY_PASS" ]; then
-                echo -e "${RED}❌ 错误：所有必填项均不可为空！${NC}"
+                echo -e "${RED}错误：所有必填项均不可为空！${NC}"
                 read -p "按回车键继续..."
                 return
             fi
@@ -100,12 +101,12 @@ setup_smtp_relay() {
             fi
 
             systemctl restart postfix
-            echo -e "${GREEN}✅ SMTP 中继配置完成，Postfix 已自动重启重载！${NC}"
+            echo -e "${GREEN}SUCCESS: SMTP 中继配置完成，Postfix 已重启！${NC}"
             read -p "按回车键继续..."
             ;;
         2)
             if [ -z "$CURRENT_RELAY" ]; then
-                echo -e "${RED}❌ 当前未启用 SMTP 中继，无法测试！${NC}"
+                echo -e "${RED}错误：当前未启用 SMTP 中继，无法测试！${NC}"
             else
                 RELAY_HOST_ONLY=$(echo "$CURRENT_RELAY" | tr -d '[]' | cut -d: -f1)
                 RELAY_PORT_ONLY=$(echo "$CURRENT_RELAY" | tr -d '[]' | cut -d: -f2)
@@ -118,9 +119,9 @@ setup_smtp_relay() {
                 fi
 
                 if [ $? -eq 0 ]; then
-                    echo -e "${GREEN}✅ 端口连通正常！中继节点网络畅通。${NC}"
+                    echo -e "${GREEN}SUCCESS: 端口连通正常！中继节点网络畅通。${NC}"
                 else
-                    echo -e "${RED}❌ 无法连接到 ${RELAY_HOST_ONLY}:${RELAY_PORT_ONLY}，请检查防火墙或网络配置。${NC}"
+                    echo -e "${RED}ERROR: 无法连接到 ${RELAY_HOST_ONLY}:${RELAY_PORT_ONLY}，请检查防火墙。${NC}"
                 fi
             fi
             read -p "按回车键继续..."
@@ -131,7 +132,7 @@ setup_smtp_relay() {
             postconf -e "smtp_sasl_auth_enable = no"
             rm -f /etc/postfix/sasl_passwd /etc/postfix/sasl_passwd.db
             systemctl restart postfix
-            echo -e "${GREEN}✅ 已禁用 SMTP 中继，恢复为原生 25 端口直连。${NC}"
+            echo -e "${GREEN}SUCCESS: 已禁用 SMTP 中继，恢复 25 端口直连。${NC}"
             read -p "按回车键继续..."
             ;;
         0)
@@ -147,10 +148,10 @@ setup_smtp_relay() {
 # 3. 日志查看
 show_logs() {
     clear
-    echo -e "${CYAN}====================================================${NC}"
-    echo -e "${CYAN}               📜 邮件服务实时运行日志               ${NC}"
-    echo -e "${CYAN}====================================================${NC}"
-    echo "按 Ctrl + C 即可退出日志查看"
+    echo -e "${CYAN}+----------------------------------------------------+${NC}"
+    echo -e "${CYAN}|               邮件服务实时运行日志                 |${NC}"
+    echo -e "${CYAN}+----------------------------------------------------+${NC}"
+    echo "提示: 按 Ctrl + C 即可退出日志查看"
     echo "----------------------------------------------------"
     journalctl -u postfix -u dovecot -f -n 50
 }
@@ -159,7 +160,7 @@ show_logs() {
 restart_services() {
     echo -e "\n${BLUE}正在重启 Postfix 与 Dovecot...${NC}"
     systemctl restart postfix dovecot
-    echo -e "${GREEN}✅ 服务重启成功！${NC}"
+    echo -e "${GREEN}SUCCESS: 服务重启成功！${NC}"
     sleep 1.5
 }
 
@@ -173,7 +174,7 @@ update_script() {
     curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh -o uninstall.sh
     chmod +x *.sh
     
-    echo -e "${GREEN}✅ 控制台脚本已成功更新至最新版本！即将重启控制台...${NC}"
+    echo -e "${GREEN}SUCCESS: 控制台脚本已成功更新！即将重启控制台...${NC}"
     sleep 1.5
     exec ./mail.sh
 }
@@ -184,23 +185,23 @@ show_menu() {
         clear
         PUBLIC_IP=$(curl -s -4 ifconfig.me || echo "未知")
         
-        echo -e "${CYAN}====================================================${NC}"
-        echo -e "${CYAN}   🚀 Debian Mail Server 控制面板 (mail)            ${NC}"
-        echo -e "${CYAN}====================================================${NC}"
-        echo -e " 服务器公网 IP : ${YELLOW}${PUBLIC_IP}${NC}"
-        echo -e " Postfix (SMTP) : $(get_service_status postfix)"
-        echo -e " Dovecot (IMAP) : $(get_service_status dovecot)"
-        echo -e " 发信工作模式   : $(get_relay_status)"
-        echo -e "${CYAN}----------------------------------------------------${NC}"
-        echo -e " 1) 👥 邮箱账号管理 (添加/删除/修改密码)"
-        echo -e " 2) ⚙️  配置 SMTP Relay 中继 (解决甲骨文 25 端口限制)"
-        echo -e " 3) 📜 查看邮件服务实时日志"
-        echo -e " 4) 🔄 重启邮件核心组件"
-        echo -e " 5) 🆙 在线检查并更新控制台脚本"
-        echo -e " 6) 🗑️ 彻底卸载 Mail Server"
-        echo -e " 0) 🚪 退出控制台"
-        echo -e "${CYAN}====================================================${NC}"
-        read -p "请输入选项 [0-6]: " choice
+        echo -e "${CYAN}+----------------------------------------------------+${NC}"
+        echo -e "${CYAN}|          Debian Mail Server 控制面板               |${NC}"
+        echo -e "${CYAN}+----------------------------------------------------+${NC}"
+        echo -e "  服务器公网 IP  : ${YELLOW}${PUBLIC_IP}${NC}"
+        echo -e "  Postfix (SMTP) : $(get_service_status postfix)"
+        echo -e "  Dovecot (IMAP) : $(get_service_status dovecot)"
+        echo -e "  发信工作模式   : $(get_relay_status)"
+        echo -e "${CYAN}+----------------------------------------------------+${NC}"
+        echo -e "  [1] 邮箱账号管理 (添加 / 删除 / 修改密码)"
+        echo -e "  [2] 配置 SMTP Relay 中继 (解决 25 端口限制)"
+        echo -e "  [3] 查看邮件服务实时日志"
+        echo -e "  [4] 重启邮件核心组件"
+        echo -e "  [5] 在线检查并更新控制台脚本"
+        echo -e "  [6] 彻底卸载 Mail Server"
+        echo -e "  [0] 退出控制台"
+        echo -e "${CYAN}+----------------------------------------------------+${NC}"
+        read -p " 请输入选项 [0-6]: " choice
 
         case "$choice" in
             1) manage_users ;;
@@ -218,7 +219,7 @@ show_menu() {
                 fi
                 ;;
             0)
-                echo -e "${GREEN}感谢使用！退回系统终端。${NC}"
+                echo -e "${GREEN}已退出控制台。${NC}"
                 exit 0
                 ;;
             *)
