@@ -25,12 +25,12 @@
 
 **海外 / 通用：**
 ```bash
-mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && curl -sSL [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh) -o mail.sh && curl -sSL [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh) -o deploy.sh && curl -sSL [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh) -o uninstall.sh && chmod +x *.sh && ./mail.sh
+mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh -o mail.sh && curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh -o deploy.sh && curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/manage.sh -o manage.sh && curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh -o uninstall.sh && chmod +x *.sh && ./mail.sh
 ```
 
 **国内 CDN 镜像加速：**
 ```bash
-mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && curl -sSL [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh) -o mail.sh && curl -sSL [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh) -o deploy.sh && curl -sSL [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh) -o uninstall.sh && chmod +x *.sh && ./mail.sh
+mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && curl -sSL https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh -o mail.sh && curl -sSL https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh -o deploy.sh && curl -sSL https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/manage.sh -o manage.sh && curl -sSL https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh -o uninstall.sh && chmod +x *.sh && ./mail.sh
 ```
 
 ---
@@ -39,12 +39,12 @@ mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && curl -sSL [https://c
 
 **海外 / 通用：**
 ```bash
-mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && wget -q [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh) -O mail.sh && wget -q [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh) -O deploy.sh && wget -q [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh) -O uninstall.sh && chmod +x *.sh && ./mail.sh
+mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && wget -q https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh -O mail.sh && wget -q https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh -O deploy.sh && wget -q https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/manage.sh -O manage.sh && wget -q https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh -O uninstall.sh && chmod +x *.sh && ./mail.sh
 ```
 
 **国内 CDN 镜像加速：**
 ```bash
-mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && wget -q [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh) -O mail.sh && wget -q [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh) -O deploy.sh && wget -q [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh) -O uninstall.sh && chmod +x *.sh && ./mail.sh
+mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && wget -q https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh -O mail.sh && wget -q https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh -O deploy.sh && wget -q https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/manage.sh -O manage.sh && wget -q https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh -O uninstall.sh && chmod +x *.sh && ./mail.sh
 ```
 
 ---
