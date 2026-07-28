@@ -20,29 +20,44 @@
 
 在全新 Debian / Ubuntu 系统上以 `root` 权限运行：
 
-### 1. `curl` 方式（完整套件）
+### 1. curl 方式（完整套件）
 
-**海外/通用：**
+**海外 / 通用：**
 ```bash
 mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && curl -sSL [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh) -o mail.sh && curl -sSL [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh) -o deploy.sh && curl -sSL [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh) -o uninstall.sh && chmod +x *.sh && ./mail.sh
+```
 
 **国内 CDN 镜像加速：**
 ```bash
 mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && curl -sSL [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh) -o mail.sh && curl -sSL [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh) -o deploy.sh && curl -sSL [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh) -o uninstall.sh && chmod +x *.sh && ./mail.sh
+```
 
-###2. `wget / bash` 方式（完整套件）
-**海外/通用：**
+---
+
+### 2. wget / bash 方式（完整套件）
+
+**海外 / 通用：**
 ```bash
 mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && wget -q [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh) -O mail.sh && wget -q [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh) -O deploy.sh && wget -q [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh) -O uninstall.sh && chmod +x *.sh && ./mail.sh
+```
 
 **国内 CDN 镜像加速：**
 ```bash
 mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && wget -q [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh) -O mail.sh && wget -q [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh) -O deploy.sh && wget -q [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh) -O uninstall.sh && chmod +x *.sh && ./mail.sh
+```
 
-##快捷菜单唤起
-**安装成功后，在服务器任何目录下直接输入以下命令即可随时调出控制台：**
+---
+
+## ⚡ 快捷菜单唤起
+
+安装成功后，在服务器任何目录下直接输入以下命令即可随时调出控制台：
+
 ```bash
 mail
+```
 
-##📄 开源协议
-MIT License
+---
+
+## 📄 开源协议
+
+[MIT License](LICENSE)
