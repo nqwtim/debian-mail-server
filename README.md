@@ -15,11 +15,12 @@
 
 ---
 
-## 🛠️ 快速开始
+## 🛠️ 一键部署
+
+在全新的 Debian / Ubuntu 系统上用 `root` 权限直接运行：
 
 ```bash
-chmod +x deploy.sh manage.sh
-sudo ./deploy.sh
+bash <(curl -sSL [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh))
 
 📄 开源协议
 MIT License
