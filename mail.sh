@@ -163,6 +163,21 @@ restart_services() {
     sleep 1.5
 }
 
+# 5. 在线更新脚本
+update_script() {
+    echo -e "\n${BLUE}正在拉取 GitHub 最新版本的管理脚本...${NC}"
+    cd ~/debian-mail-server || exit 1
+    
+    curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh -o mail.sh
+    curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh -o deploy.sh
+    curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh -o uninstall.sh
+    chmod +x *.sh
+    
+    echo -e "${GREEN}✅ 控制台脚本已成功更新至最新版本！即将重启控制台...${NC}"
+    sleep 1.5
+    exec ./mail.sh
+}
+
 # 主菜单
 show_menu() {
     while true; do
@@ -181,17 +196,19 @@ show_menu() {
         echo -e " 2) ⚙️  配置 SMTP Relay 中继 (解决甲骨文 25 端口限制)"
         echo -e " 3) 📜 查看邮件服务实时日志"
         echo -e " 4) 🔄 重启邮件核心组件"
-        echo -e " 5) 🗑️ 彻底卸载 Mail Server"
+        echo -e " 5) 🆙 在线检查并更新控制台脚本"
+        echo -e " 6) 🗑️ 彻底卸载 Mail Server"
         echo -e " 0) 🚪 退出控制台"
         echo -e "${CYAN}====================================================${NC}"
-        read -p "请输入选项 [0-5]: " choice
+        read -p "请输入选项 [0-6]: " choice
 
         case "$choice" in
             1) manage_users ;;
             2) setup_smtp_relay ;;
             3) show_logs ;;
             4) restart_services ;;
-            5) 
+            5) update_script ;;
+            6) 
                 if [ -f "./uninstall.sh" ]; then
                     bash ./uninstall.sh
                     exit 0
