@@ -1,181 +1,215 @@
-#!/bin/bash
-# Debian / Ubuntu Mail Server 综合管理控制面板
+#!/usr/bin/env bash
+
+# ====================================================
+# Debian Mail Server Auto-Deploy & Management Console
+# Mail Control Panel Script
+# ====================================================
 
 RED='\033[0;31m'
 GREEN='\033[0;32m'
-YELLOW='\033[1;33m'
+YELLOW='\033[0;33m'
 BLUE='\033[0;34m'
 CYAN='\033[0;36m'
 NC='\033[0m'
 
-# 检查 root 权限
 if [ "$EUID" -ne 0 ]; then
-   echo -e "${RED}错误：请使用 root 权限运行此脚本！${NC}"
-   exit 1
+    echo -e "${RED}错误：请使用 root 权限运行此脚本。${NC}"
+    exit 1
 fi
 
-# 1. 状态获取函数
-get_status() {
-    OS_NAME=$(cat /etc/os-release | grep -w "PRETTY_NAME" | cut -d'"' -f2)
-    SYS_IP=$(curl -s4 --connect-timeout 2 https://api.ipify.org || curl -s4 --connect-timeout 2 https://icanhazip.com || echo "未知IP")
-    
-    # Postfix 状态
-    if systemctl is-active --quiet postfix; then
-        POSTFIX_STATUS="${GREEN}运行中${NC}"
+# 获取当前发信模式状态
+get_relay_status() {
+    CURRENT_RELAY=$(postconf -h relayhost 2>/dev/null)
+    if [ -n "$CURRENT_RELAY" ]; then
+        echo -e "${GREEN}中继转发 (${CURRENT_RELAY})${NC}"
     else
-        POSTFIX_STATUS="${RED}未运行${NC}"
+        echo -e "${YELLOW}25 端口直连${NC}"
     fi
-
-    # Dovecot 状态
-    if systemctl is-active --quiet dovecot; then
-        DOVECOT_STATUS="${GREEN}运行中${NC}"
-    else
-        DOVECOT_STATUS="${RED}未运行${NC}"
-    fi
-
-    # SSL 证书状态
-    if [ -f "/etc/postfix/certs/fullchain.cer" ]; then
-        CERT_EXP=$(openssl x509 -in /etc/postfix/certs/fullchain.cer -noout -enddate 2>/dev/null | cut -d= -f2)
-        SSL_STATUS="${GREEN}已绑定${NC} (到期: ${CERT_EXP:-未知})"
-    else
-        SSL_STATUS="${RED}未部署证书${NC}"
-    fi
-
-    # 邮箱账号数量统计 (读取 shell 为 /bin/false 的普通用户)
-    MAIL_USERS_COUNT=$(awk -F: '$7 == "/bin/false" {print $1}' /etc/passwd | wc -l)
 }
 
-# 2. 菜单界面渲染
-show_menu() {
+# 获取服务运行状态
+get_service_status() {
+    local service=$1
+    if systemctl is-active --quiet "$service"; then
+        echo -e "${GREEN}运行中${NC}"
+    else
+        echo -e "${RED}已停止${NC}"
+    fi
+}
+
+# 1. 账号管理
+manage_users() {
+    if [ -f "./manage.sh" ]; then
+        bash ./manage.sh
+    else
+        echo -e "${RED}错误：未找到 manage.sh 脚本！${NC}"
+        read -p "按回车键继续..."
+    fi
+}
+
+# 2. SMTP Relay 配置功能
+setup_smtp_relay() {
     clear
-    get_status
-    echo -e "${CYAN}=================================================================${NC}"
-    echo -e "${GREEN} Debian / Ubuntu Postfix + Dovecot + SSL 邮局一体化管理面板${NC}"
-    echo -e " 快捷调用命令: ${YELLOW}mail${NC}"
-    echo -e "${CYAN}=================================================================${NC}"
-    echo -e " ${GREEN}1.${NC} 一键安装 / 部署邮局环境"
-    echo -e " ${RED}2. 彻底卸载邮局服务与环境${NC}"
-    echo -e "${CYAN}-----------------------------------------------------------------${NC}"
-    echo -e " ${GREEN}3.${NC} 添加新邮箱账号             ${GREEN}4.${NC} 删除已有邮箱账号"
-    echo -e " ${GREEN}5.${NC} 修改邮箱账号密码           ${GREEN}6.${NC} 查看所有邮箱账号列表"
-    echo -e " ${GREEN}7.${NC} 添加/管理邮件转发别名(Aliases)"
-    echo -e "${CYAN}-----------------------------------------------------------------${NC}"
-    echo -e " ${GREEN}8.${NC} 检查 / 手动强制续期 SSL 证书"
-    echo -e " ${GREEN}9.${NC} 查看邮局服务实时运行日志"
-    echo -e " ${GREEN}10.${NC} 重启邮局核心服务 (Postfix + Dovecot)"
-    echo -e " ${GREEN}11.${NC} 修复/设置系统快捷键 [mail]"
-    echo -e " ${GREEN}0.${NC} 退出脚本"
-    echo -e "${CYAN}~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~${NC}"
-    echo -e " ${YELLOW}VPS 状态如下：${NC}"
-    echo -e " 系统版本 : ${OS_NAME}"
-    echo -e " 公网 IP  : ${SYS_IP}"
-    echo -e " Postfix  : ${POSTFIX_STATUS} (端口: 25, 587)"
-    echo -e " Dovecot  : ${DOVECOT_STATUS} (端口: 993)"
-    echo -e " SSL 证书 : ${SSL_STATUS}"
-    echo -e " 已存账号 : ${YELLOW}${MAIL_USERS_COUNT}${NC} 个独立邮箱用户"
-    echo -e "${CYAN}=================================================================${NC}"
-}
-
-# 3. 功能交互逻辑
-set_shortcut() {
-    ln -sf "$(pwd)/mail.sh" /usr/local/bin/mail
-    chmod +x /usr/local/bin/mail
-    echo -e "${GREEN}✅ 已成功将快捷指令注册为 [mail]！今后在任何目录下输入 mail 即可直接调出控制台。${NC}"
-}
-
-list_users() {
-    echo -e "\n${YELLOW}=== 当前服务器上的所有邮箱账号 ===${NC}"
-    awk -F: '$7 == "/bin/false" {print " - " $1}' /etc/passwd
-    echo ""
-}
-
-show_logs() {
-    echo -e "${YELLOW}正在查看邮局实时日志 (按 Ctrl+C 退出查看)...${NC}"
-    if [ -f "/var/log/mail.log" ]; then
-        tail -n 50 -f /var/log/mail.log
+    echo -e "${CYAN}====================================================${NC}"
+    echo -e "${CYAN}    ⚙️  SMTP Relay 中继设置 (适配甲骨文云等 25 端口封禁)   ${NC}"
+    echo -e "${CYAN}====================================================${NC}"
+    
+    CURRENT_RELAY=$(postconf -h relayhost 2>/dev/null)
+    if [ -n "$CURRENT_RELAY" ]; then
+        echo -e "当前发信模式: ${GREEN}已启用 SMTP 中继 (${CURRENT_RELAY})${NC}\n"
     else
-        journalctl -u postfix -u dovecot -f -n 50
+        echo -e "当前发信模式: ${YELLOW}未启用 (25 端口直连模式)${NC}\n"
     fi
-}
 
-# 循环主菜单
-set_shortcut >/dev/null 2>&1
+    echo -e "1) 配置 / 修改 SMTP 中继 (支持 OCI / Brevo / Resend 等)"
+    echo -e "2) 测试当前 SMTP 中继节点连通性"
+    echo -e "3) 禁用 SMTP 中继 (恢复 25 端口直连)"
+    echo -e "0) 返回主菜单"
+    echo "----------------------------------------------------"
+    read -p "请选择操作 [0-3]: " relay_choice
 
-while true; do
-    show_menu
-    read -p "请输入选项 [0-11]: " choice
-    case $choice in
+    case "$relay_choice" in
         1)
-            bash ./deploy.sh
+            echo -e "\n${YELLOW}[请输入中继服务商提供的 SMTP 信息]${NC}"
+            read -p "1. SMTP 服务器地址 (例如: smtp.email.us-sanjose-1.oraclecloud.com): " RELAY_HOST
+            read -p "2. SMTP 端口 [默认: 587]: " RELAY_PORT
+            RELAY_PORT=${RELAY_PORT:-587}
+            read -p "3. SMTP 账号/Username: " RELAY_USER
+            read -p "4. SMTP 密码/Password: " RELAY_PASS
+
+            if [ -z "$RELAY_HOST" ] || [ -z "$RELAY_USER" ] || [ -z "$RELAY_PASS" ]; then
+                echo -e "${RED}❌ 错误：所有必填项均不可为空！${NC}"
+                read -p "按回车键继续..."
+                return
+            fi
+
+            echo -e "\n${BLUE}正在配置 SASL 认证凭据...${NC}"
+            echo "[${RELAY_HOST}]:${RELAY_PORT}  ${RELAY_USER}:${RELAY_PASS}" > /etc/postfix/sasl_passwd
+            chmod 600 /etc/postfix/sasl_passwd
+            postmap /etc/postfix/sasl_passwd
+
+            echo -e "${BLUE}正在更新 Postfix 参数...${NC}"
+            postconf -e "relayhost = [${RELAY_HOST}]:${RELAY_PORT}"
+            postconf -e "smtp_sasl_auth_enable = yes"
+            postconf -e "smtp_sasl_password_maps = hash:/etc/postfix/sasl_passwd"
+            postconf -e "smtp_sasl_security_options = noanonymous"
+            postconf -e "smtp_tls_security_level = encrypt"
+            
+            if [ -f /etc/ssl/certs/ca-certificates.crt ]; then
+                postconf -e "smtp_tls_CAfile = /etc/ssl/certs/ca-certificates.crt"
+            fi
+
+            systemctl restart postfix
+            echo -e "${GREEN}✅ SMTP 中继配置完成，Postfix 已自动重启重载！${NC}"
             read -p "按回车键继续..."
             ;;
         2)
-            bash ./uninstall.sh
+            if [ -z "$CURRENT_RELAY" ]; then
+                echo -e "${RED}❌ 当前未启用 SMTP 中继，无法测试！${NC}"
+            else
+                RELAY_HOST_ONLY=$(echo "$CURRENT_RELAY" | tr -d '[]' | cut -d: -f1)
+                RELAY_PORT_ONLY=$(echo "$CURRENT_RELAY" | tr -d '[]' | cut -d: -f2)
+                echo -e "\n${BLUE}正在测试与 ${RELAY_HOST_ONLY}:${RELAY_PORT_ONLY} 的网络连通性...${NC}"
+                
+                if command -v nc >/dev/null 2>&1; then
+                    nc -zv -w 5 "$RELAY_HOST_ONLY" "$RELAY_PORT_ONLY"
+                else
+                    timeout 5 bash -c "</dev/tcp/${RELAY_HOST_ONLY}/${RELAY_PORT_ONLY}" 2>/dev/null
+                fi
+
+                if [ $? -eq 0 ]; then
+                    echo -e "${GREEN}✅ 端口连通正常！中继节点网络畅通。${NC}"
+                else
+                    echo -e "${RED}❌ 无法连接到 ${RELAY_HOST_ONLY}:${RELAY_PORT_ONLY}，请检查防火墙或网络配置。${NC}"
+                fi
+            fi
             read -p "按回车键继续..."
             ;;
         3)
-            read -p "请输入新邮箱用户名: " username
-            if [ -n "$username" ]; then
-                useradd -s /bin/false -m "$username" && passwd "$username"
-            fi
+            echo -e "\n${YELLOW}正在清理中继配置...${NC}"
+            postconf -e "relayhost ="
+            postconf -e "smtp_sasl_auth_enable = no"
+            rm -f /etc/postfix/sasl_passwd /etc/postfix/sasl_passwd.db
+            systemctl restart postfix
+            echo -e "${GREEN}✅ 已禁用 SMTP 中继，恢复为原生 25 端口直连。${NC}"
             read -p "按回车键继续..."
-            ;;
-        4)
-            list_users
-            read -p "请输入要删除的用户名: " del_user
-            if [ -n "$del_user" ]; then
-                userdel -r "$del_user" 2>/dev/null
-                echo -e "${GREEN}用户 $del_user 已安全彻底删除。${NC}"
-            fi
-            read -p "按回车键继续..."
-            ;;
-        5)
-            list_users
-            read -p "请输入要修改密码的用户名: " ch_user
-            if [ -n "$ch_user" ]; then
-                passwd "$ch_user"
-            fi
-            read -p "按回车键继续..."
-            ;;
-        6)
-            list_users
-            read -p "按回车键继续..."
-            ;;
-        7)
-            read -p "请输入前缀别名 (如 info): " alias_name
-            read -p "请输入接收别名邮件的目标用户名: " target_user
-            if [ -n "$alias_name" ] && [ -n "$target_user" ]; then
-                echo "${alias_name}: ${target_user}" >> /etc/aliases
-                newaliases
-                echo -e "${GREEN}✅ 别名 ${alias_name} -> ${target_user} 创建成功！${NC}"
-            fi
-            read -p "按回车键继续..."
-            ;;
-        8)
-            echo -e "${YELLOW}正在使用 acme.sh 检查与续期 SSL 证书...${NC}"
-            /root/.acme.sh/acme.sh --cron --home /root/.acme.sh
-            systemctl restart postfix dovecot
-            read -p "按回车键继续..."
-            ;;
-        9)
-            show_logs
-            ;;
-        10)
-            systemctl restart postfix dovecot
-            echo -e "${GREEN}✅ Postfix 和 Dovecot 服务已成功重启！${NC}"
-            sleep 1.5
-            ;;
-        11)
-            set_shortcut
-            sleep 1.5
             ;;
         0)
-            echo -e "${GREEN}感谢使用，再见！${NC}"
-            exit 0
+            return
             ;;
         *)
-            echo -e "${RED}错误：无效选项！${NC}"
+            echo -e "${RED}无效选项！${NC}"
             sleep 1
             ;;
     esac
-done
+}
+
+# 3. 日志查看
+show_logs() {
+    clear
+    echo -e "${CYAN}====================================================${NC}"
+    echo -e "${CYAN}               📜 邮件服务实时运行日志               ${NC}"
+    echo -e "${CYAN}====================================================${NC}"
+    echo "按 Ctrl + C 即可退出日志查看"
+    echo "----------------------------------------------------"
+    journalctl -u postfix -u dovecot -f -n 50
+}
+
+# 4. 重启服务
+restart_services() {
+    echo -e "\n${BLUE}正在重启 Postfix 与 Dovecot...${NC}"
+    systemctl restart postfix dovecot
+    echo -e "${GREEN}✅ 服务重启成功！${NC}"
+    sleep 1.5
+}
+
+# 主菜单
+show_menu() {
+    while true; do
+        clear
+        PUBLIC_IP=$(curl -s -4 ifconfig.me || echo "未知")
+        
+        echo -e "${CYAN}====================================================${NC}"
+        echo -e "${CYAN}   🚀 Debian Mail Server 控制面板 (mail)            ${NC}"
+        echo -e "${CYAN}====================================================${NC}"
+        echo -e " 服务器公网 IP : ${YELLOW}${PUBLIC_IP}${NC}"
+        echo -e " Postfix (SMTP) : $(get_service_status postfix)"
+        echo -e " Dovecot (IMAP) : $(get_service_status dovecot)"
+        echo -e " 发信工作模式   : $(get_relay_status)"
+        echo -e "${CYAN}----------------------------------------------------${NC}"
+        echo -e " 1) 👥 邮箱账号管理 (添加/删除/修改密码)"
+        echo -e " 2) ⚙️  配置 SMTP Relay 中继 (解决甲骨文 25 端口限制)"
+        echo -e " 3) 📜 查看邮件服务实时日志"
+        echo -e " 4) 🔄 重启邮件核心组件"
+        echo -e " 5) 🗑️ 彻底卸载 Mail Server"
+        echo -e " 0) 🚪 退出控制台"
+        echo -e "${CYAN}====================================================${NC}"
+        read -p "请输入选项 [0-5]: " choice
+
+        case "$choice" in
+            1) manage_users ;;
+            2) setup_smtp_relay ;;
+            3) show_logs ;;
+            4) restart_services ;;
+            5) 
+                if [ -f "./uninstall.sh" ]; then
+                    bash ./uninstall.sh
+                    exit 0
+                else
+                    echo -e "${RED}未找到 uninstall.sh${NC}"
+                    sleep 1
+                fi
+                ;;
+            0)
+                echo -e "${GREEN}感谢使用！退回系统终端。${NC}"
+                exit 0
+                ;;
+            *)
+                echo -e "${RED}输入无效，请重新输入！${NC}"
+                sleep 1
+                ;;
+        esac
+    done
+}
+
+show_menu
