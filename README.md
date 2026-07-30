@@ -80,7 +80,7 @@ git clone https://github.com/nqwtim/debian-mail-server.git ~/debian-mail-server 
 
 ---
 
-### 二、 邮件安全与防伪造三剑客 (SPF, DKIM, DMARC)
+### 二、 邮件安全与防伪 (SPF, DKIM, DMARC)
 
 这三项配置用于向 Gmail、Outlook、QQ 邮箱等权威服务商证明“这封邮件确实由你合法发送”，是防止邮件进垃圾箱的关键。
 
