@@ -12,35 +12,35 @@
 
 ### 1. curl 方式（海外 / 通用）
 ```bash
-mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && curl -sSL [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh) -o mail.sh && curl -sSL [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh) -o deploy.sh && curl -sSL [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/manage.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/manage.sh) -o manage.sh && curl -sSL [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh) -o uninstall.sh && chmod +x *.sh && ./mail.sh
+mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh -o mail.sh && curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh -o deploy.sh && curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/manage.sh -o manage.sh && curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh -o uninstall.sh && chmod +x *.sh && ./mail.sh
 
 ```
 
 ### 2. curl 方式（国内 CDN 加速）
 
 ```bash
-mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && curl -sSL [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh) -o mail.sh && curl -sSL [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh) -o deploy.sh && curl -sSL [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/manage.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/manage.sh) -o manage.sh && curl -sSL [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh) -o uninstall.sh && chmod +x *.sh && ./mail.sh
+mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && curl -sSL https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh -o mail.sh && curl -sSL https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh -o deploy.sh && curl -sSL https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/manage.sh -o manage.sh && curl -sSL https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh -o uninstall.sh && chmod +x *.sh && ./mail.sh
 
 ```
 
 ### 3. wget 方式（海外 / 通用）
 
 ```bash
-mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && wget -q [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh) -O mail.sh && wget -q [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh) -O deploy.sh && wget -q [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/manage.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/manage.sh) -O manage.sh && wget -q [https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh](https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh) -O uninstall.sh && chmod +x *.sh && ./mail.sh
+mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && wget -q https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh -O mail.sh && wget -q https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh -O deploy.sh && wget -q https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/manage.sh -O manage.sh && wget -q https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh -O uninstall.sh && chmod +x *.sh && ./mail.sh
 
 ```
 
 ### 4. wget 方式（国内 CDN 加速）
 
 ```bash
-mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && wget -q [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh) -O mail.sh && wget -q [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh) -O deploy.sh && wget -q [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/manage.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/manage.sh) -O manage.sh && wget -q [https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh](https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh) -O uninstall.sh && chmod +x *.sh && ./mail.sh
+mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && wget -q https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/mail.sh -O mail.sh && wget -q https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/deploy.sh -O deploy.sh && wget -q https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/manage.sh -O manage.sh && wget -q https://cdn.jsdelivr.net/gh/nqwtim/debian-mail-server@main/uninstall.sh -O uninstall.sh && chmod +x *.sh && ./mail.sh
 
 ```
 
 ### 5. Git 克隆方式（开发者推荐 / 支持 git pull 更新）
 
 ```bash
-git clone [https://github.com/nqwtim/debian-mail-server.git](https://github.com/nqwtim/debian-mail-server.git) ~/debian-mail-server && cd ~/debian-mail-server && chmod +x *.sh && ./mail.sh
+git clone https://github.com/nqwtim/debian-mail-server.git ~/debian-mail-server && cd ~/debian-mail-server && chmod +x *.sh && ./mail.sh
 
 ```
 
@@ -268,7 +268,5 @@ PTR (Pointer Record) 用于将服务器 IP 反向解析为域名。各大邮件�
 1. **综合发信得分测试 (强烈推荐)**: [Mail-Tester](https://www.mail-tester.com/) （按照提示发送测试邮件，完美配置可获得 10/10 满分）
 2. **MX / SPF / DKIM 在线检测**: [MXToolbox](https://mxtoolbox.com/)
 3. **DMARC 验证工具**: [DMARC Analyzer](https://www.dmarcanalyzer.com/)
-
-```
 
 ```
