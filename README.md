@@ -10,6 +10,7 @@
 
 请根据您的服务器网络环境及下载工具，选择以下 **5 种方式之一**进行一键部署：
 
+
 ### 1. curl 方式（海外 / 通用）
 ```bash
 mkdir -p ~/debian-mail-server && cd ~/debian-mail-server && curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/mail.sh -o mail.sh && curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/deploy.sh -o deploy.sh && curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/manage.sh -o manage.sh && curl -sSL https://raw.githubusercontent.com/nqwtim/debian-mail-server/main/uninstall.sh -o uninstall.sh && chmod +x *.sh && ./mail.sh
